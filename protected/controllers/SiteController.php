@@ -9,6 +9,7 @@ class SiteController extends Controller {
 //        if (Yii::app()->session['token'] == '')
 //            $this->redirect('welcomePage');
 //    }
+    public $headerTitle;
     public function actions() {
         return array(
             // captcha action renders the CAPTCHA image displayed on the contact page
@@ -31,6 +32,7 @@ class SiteController extends Controller {
     public function actionIndex() {
         // renders the view file 'protected/views/site/index.php'
         // using the default layout 'protected/views/layouts/main.php'
+        $this->headerTitle = 'Trang chủ';
         $this->render('index');
     }
 

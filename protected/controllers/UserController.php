@@ -12,6 +12,7 @@ class UserController extends BaseController {
     }
 
     public function actionSignup() {
+        $this->retVal = new stdClass();
         $request = Yii::app()->request;
         if ($request->isPostRequest && isset($_POST)) {
             try {
@@ -31,7 +32,7 @@ class UserController extends BaseController {
                     $new_user->user_token = $token;
                     $new_user->user_active = 0;
 
-                    if ($new_user->save()) {
+                    if ($new_user->save(FALSE)) {
                         $this->retVal->message = Yii::app()->params['SIGNUP_MESSAGE_SUCCESS'];
                         $this->retVal->success = TRUE;
                     } else {
@@ -49,6 +50,7 @@ class UserController extends BaseController {
     }
 
     public function actionLogin() {
+        $this->retVal = new stdClass();
         $request = Yii::app()->request;
         if ($request->isPostRequest && isset($_POST)) {
             try {
