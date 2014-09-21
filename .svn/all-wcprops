@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/repos/uetm-backend/!svn/ver/3/trunk
+END
+.gitignore
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/repos/uetm-backend/!svn/ver/3/trunk/.gitignore
+END
+index-test.php
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/repos/uetm-backend/!svn/ver/3/trunk/index-test.php
+END
+.htaccess
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/repos/uetm-backend/!svn/ver/3/trunk/.htaccess
+END
+urllist.txt
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/repos/uetm-backend/!svn/ver/3/trunk/urllist.txt
+END
+index.php
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/repos/uetm-backend/!svn/ver/3/trunk/index.php
+END
+tags
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/repos/uetm-backend/!svn/ver/3/trunk/tags
+END

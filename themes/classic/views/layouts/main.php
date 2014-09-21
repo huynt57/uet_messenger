@@ -435,7 +435,7 @@ else echo Yii::app()->params['SITE_NAME'] ?></h1>
         <footer>
             <div class="container-fluid" id="content">
                 <div id="copyright">
-                    <span>&copy; 2013 - <?php echo date('Y') ?> - UET MESSENGER - <?php echo Yii::t(Yii::app()->params['TRANSLATE_FILE'], 'UET.') ?></span>
+                    <span>&copy; 2014 - <?php //echo date('Y') ?> - UET MESSENGER - <?php echo Yii::t(Yii::app()->params['TRANSLATE_FILE'], 'UET.') ?></span>
                 </div>
             </div>
         </footer>
