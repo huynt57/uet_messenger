@@ -26,6 +26,7 @@ return array(
         'ext.YiiMailer.YiiMailer',
         'ext.xupload.XUpload',
         'ext.xupload.eguiders',
+		'ext.YiiMongoDbSuite.*',
     ),
     'modules' => array(
         // uncomment the following to enable the Gii tool
@@ -33,6 +34,9 @@ return array(
         'gii' => array(
             'class' => 'system.gii.GiiModule',
             'password' => '1',
+            'generatorPaths' => array(
+                'ext.YiiMongoDbSuite.gii'
+            ),
         // If removed, Gii defaults to localhost only. Edit carefully to taste.
         //'ipFilters'=>array('127.0.0.1','::1'),
         ),
@@ -64,6 +68,14 @@ return array(
         ),
         'db' => array(
             'connectionString' => 'sqlite:' . dirname(__FILE__) . '/../data/testdrive.db',
+        ),
+        'mongodb' => array(
+            'class' => 'EMongoDB',
+            'connectionString' => 'mongodb://localhost:27017',
+            'dbName' => 'uet_messenger',
+            'fsyncFlag' => true,
+            'safeFlag' => true,
+            'useCursor' => false
         ),
         // uncomment the following to use a MySQL database
         'db' => array(

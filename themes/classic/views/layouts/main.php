@@ -370,13 +370,13 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="<?php echo Yii::app()->createUrl('user/signup'); ?>">
+                                <a href="http://112.137.130.47/trunk/index.php/user/signup">
 <?php echo Yii::t(Yii::app()->params['TRANSLATE_FILE'], 'Đăng kí') ?>
                                 </a>
                             </li>
 
                             <li>
-                                <a href="<?php echo Yii::app()->createUrl('user/login'); ?>">
+                                <a href="http://112.137.130.47/trunk/index.php/user/login">
 <?php echo Yii::t(Yii::app()->params['TRANSLATE_FILE'], 'Đăng nhập') ?>
                                 </a>
                             </li>

@@ -14,10 +14,11 @@ class UserController extends BaseController {
     public function actionSignup() {
         $this->retVal = new stdClass();
         $request = Yii::app()->request;
+      
         if ($request->isPostRequest && isset($_POST)) {
             try {
-                $user_email = StringHelper::filterString(Yii::app()->request->getPost('user_email'));
-                $user_password = StringHelper::filterString(Yii::app()->request->getPost('user_password'));
+                $user_email = Yii::app()->request->getPost('user_email');
+                $user_password = Yii::app()->request->getPost('user_password');
                 //check if user is existed or not
                 $user = User::model()->findByAttributes(array('user_email' => $user_email));
                 if ($user) {
@@ -30,11 +31,12 @@ class UserController extends BaseController {
                     $new_user->user_email = $user_email;
                     $new_user->user_password = md5($user_password);
                     $new_user->user_token = $token;
-                    $new_user->user_active = 0;
+                    $new_user->user_active = 1;
 
                     if ($new_user->save(FALSE)) {
                         $this->retVal->message = Yii::app()->params['SIGNUP_MESSAGE_SUCCESS'];
                         $this->retVal->success = TRUE;
+                        $this->retVal->message_data = $message;
                     } else {
                         $this->retVal->message = Yii::app()->params['SIGNUP_MESSAGE_FAIL'];
                         $this->retVal->success = FALSE;
@@ -50,24 +52,24 @@ class UserController extends BaseController {
     }
 
     public function actionLogin() {
+      
         $this->retVal = new stdClass();
         $request = Yii::app()->request;
         if ($request->isPostRequest && isset($_POST)) {
             try {
-                $user_email = StringHelper::filterString(Yii::app()->request->getPost('user_email'));
-                $user_password = StringHelper::filterString(Yii::app()->request->getPost('user_password'));
+                $user_email = Yii::app()->request->getPost('user_email');
+                $user_password = Yii::app()->request->getPost('user_password');
                 $user = User::model()->findByAttributes(array('user_email' => $user_email));
                 if ($user) {
                     if ($user->user_active == 0) {
-                        $this->retVal->message = Yii::app()->params['USER_NOT_ACTIVATE'];
-                        ;
+                        $this->retVal->message = Yii::app()->params['USER_NOT_ACTIVATE'];                       
                         $this->retVal->success = FALSE;
                     } else {
                         //user existed, check password
-                        if (strcmp($user->user_password, md5($user_password) == 0)) {
+                        if ($user->user_password == md5($user_password)) {
                             //token
                             $token = StringHelper::generateToken(16, 36);
-                            $user->token = $token;
+                            $user->user_token = $token;
                             $user->save(FALSE);
                             if ($user->save(FALSE)) {
                                 $this->retVal->message = Yii::app()->params['LOGIN_MESSAGE_SUCCESS'];
@@ -81,7 +83,7 @@ class UserController extends BaseController {
                         } else {
                             //wrong device token
                             $this->retVal->message = Yii::app()->params['WRONG_PASSWORD'];
-                            $this->retVal->success = TRUE;
+                            $this->retVal->success = FALSE;
                         }
                     }
                 } else {
@@ -98,6 +100,7 @@ class UserController extends BaseController {
 
         $this->render('login');
     }
+    
 
     // Uncomment the following methods and override them if needed
     /*
