@@ -61,6 +61,25 @@ class MessageController extends BaseController {
         $this->render('NewMessage');
     }
 
+    public function insertDummyData() {
+        for ($i = 0; $i < 100; $i++) {
+            $new_mess = new Message;
+            $new_mess->from = "huy".$i;
+            $new_mess->to = "dummy".$i;
+            $new_mess->message = "test".$i;
+            $new_mess->sent_date = date('m/d/Y h:i:s');
+            $new_mess->save(FALSE);
+        }
+    }
+    
+    public function actionGetDummyData(){
+        $this->insertDummyData();
+        $message_dummy = Message::model()->findAll();
+        echo CJSON::encode($message_dummy);
+    }
+    
+    
+
     // Uncomment the following methods and override them if needed
     /*
       public function filters()

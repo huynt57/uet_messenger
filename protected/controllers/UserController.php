@@ -14,7 +14,7 @@ class UserController extends BaseController {
     public function actionSignup() {
         $this->retVal = new stdClass();
         $request = Yii::app()->request;
-      
+
         if ($request->isPostRequest && isset($_POST)) {
             try {
                 $user_email = Yii::app()->request->getPost('user_email');
@@ -52,7 +52,7 @@ class UserController extends BaseController {
     }
 
     public function actionLogin() {
-      
+
         $this->retVal = new stdClass();
         $request = Yii::app()->request;
         if ($request->isPostRequest && isset($_POST)) {
@@ -62,7 +62,7 @@ class UserController extends BaseController {
                 $user = User::model()->findByAttributes(array('user_email' => $user_email));
                 if ($user) {
                     if ($user->user_active == 0) {
-                        $this->retVal->message = Yii::app()->params['USER_NOT_ACTIVATE'];                       
+                        $this->retVal->message = Yii::app()->params['USER_NOT_ACTIVATE'];
                         $this->retVal->success = FALSE;
                     } else {
                         //user existed, check password
@@ -100,7 +100,168 @@ class UserController extends BaseController {
 
         $this->render('login');
     }
-    
+
+//    public function actionAddDummyData() {
+//        $datas = array('Nguyễn Thế Huy', 'Nguyễn Đức Thịnh', 'Phan Duy Thành', 'Nguyễn Thạc Thống', 'Ngô Anh Long', 'Phùng Nguyên Ngọc', 'Phạm Duy Thiện', 'Nguyễn Văn Lượng');
+//        $ids = array('3', '4', '5', '6');
+//        foreach ($ids as $id) {
+//            foreach ($datas as $data) {
+//                $user = new User;
+//                $user->user_name = $data;
+//
+//                $root = User::model()->findByPk($id);
+//                $user->appendTo($root);
+//            }
+//        }
+//    }
+
+    public function actionGetAllTree() {
+        $this->retVal = new stdClass();
+        $tree = User::model()->findAll(array('order' => 'lft'));
+        $this->retVal->tree = $tree;
+        echo CJSON::encode($this->retVal);
+        $this->render('getalltree');
+    }
+
+    public function actionGetAllRoots() {
+        $this->retVal = new stdClass();
+        $roots = User::model()->roots()->findAll();
+        $this->retVal->roots = $roots;
+        echo CJSON::encode($this->retVal);
+        $this->render('getallroots');
+    }
+
+    public function actionGetChildOfRootById() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $root = Yii::app()->request->getPost('root');
+                $users = User::model()->findByPk($root);
+                $descendants = $users->children()->findAll();
+                $this->retVal->data = $descendants;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getchildofrootbyid');
+    }
+
+    public function actionGetChildOfRootByName() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $root = Yii::app()->request->getPost('root');
+                $users = User::model()->findByAttributes(array('user_name' => $root));
+                $descendants = $users->children()->findAll();
+                $this->retVal->data = $descendants;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getchildofrootbyname');
+    }
+
+    public function actionGetParentOfNodeById() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $node = Yii::app()->request->getPost('node');
+                $node_data = User::model()->findByPk($node);
+                $parent = $node_data->parent()->findAll();
+                $this->retVal->data = $parent;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getparentofnodebyid');
+    }
+
+    public function actionGetParentOfNodeByName() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $node = Yii::app()->request->getPost('node');
+                $node_data = User::model()->findByAttributes(array('user_name' => $node));
+                $parent = $node_data->parent()->findAll();
+                $this->retVal->data = $parent;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getparentofnodebyname');
+    }
+
+    public function actionGetNodeNextSiblingById() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $node = Yii::app()->request->getPost('node');
+                $user = User::model()->findByPk($node);
+                $nextSibling = $user->nextSibling()->findAll();
+                $this->retVal->data = $nextSibling;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getnodenextsiblingbyid');
+    }
+
+    public function actionGetNodePrevSiblingById() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $node = Yii::app()->request->getPost('node');
+                $user = User::model()->findByPk($node);
+                $prevSibling = $user->prevSibling()->findAll();
+                $this->retVal->data = $prevSibling;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getnodeprevsiblingbyid');
+    }
+
+    public function getNodeById() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $node = Yii::app()->request->getPost('node');
+                $user = User::model()->findByPk($node);
+                $this->retVal->data = $user;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getnodebyid');
+    }
 
     // Uncomment the following methods and override them if needed
     /*
