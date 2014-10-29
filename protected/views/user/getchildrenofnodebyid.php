@@ -10,7 +10,7 @@
                     $('#res').html('Loading...');
                 },
                 type: "POST",
-                url: '<?php echo Yii::app()->createAbsoluteUrl('index.php/user/getchildofrootbyid')?>',
+                url: '<?php echo Yii::app()->createAbsoluteUrl('index.php/user/getchildrenofnodebyid')?>',
                 data: dulieu,
                 success: function(data) {
                     $('#res').html('');
@@ -23,9 +23,9 @@
 </script>
 <form action="javascript:void(0);" method="POST" class='form-horizontal' id="form-login">
     <div class="control-group">
-        <label for="textfield" class="control-label">Tên Root</label>
+        <label for="textfield" class="control-label">ID Node</label>
         <div class="controls">
-            <input type="text" name="root" id="textfield" class="input-xlarge">
+            <input type="text" name="node" id="textfield" class="input-xlarge">
            
         </div>
     </div>

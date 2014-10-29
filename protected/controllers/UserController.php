@@ -11,6 +11,81 @@ class UserController extends BaseController {
         $this->render('index');
     }
 
+    public function authenticate($token, $token_salt) {
+
+        $token_flag = User::model()->findByAttributes(array('user_token' => $token));
+        if ($token_flag) {
+            if (md5($token_flag->user_token . 'uetm') == $token_salt) {
+                $token_expiry_date = $token_flag->token_expiry_date;
+                $date_now = date('Y-m-d H:i:s');
+                if (strtotime($date) < strtotime($token_expiry_date)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    
+
+    public function actionAuthenticate() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $turn_off_authenticate = Yii::app()->request->getPost('config_authenticate');
+                $token = Yii::app()->request->getPost('token');
+                $token_salt = Yii::app()->request->getPost('token_salt');
+                if ($turn_off_authenticate == '') {
+                    if ($this->authenticate($token, $token_salt)) {
+                        $this->retVal->message = "OK";
+                    } else {
+                        $this->retVal->message = "Token expired";
+                    }
+                } else {
+                    $this->retVal->message = "Turn off authenticate, do nothing";
+                }
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('authenticate');
+    }
+
+    public function actionRefreshToken() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $user_id = Yii::app()->request->getPost('user_id');
+                $user = User::model()->findByAttributes(array('user_id' => $user_id));
+                if ($user) {
+                    $token = StringHelper::generateToken(16, 36);
+                    $user->user_token = $token;
+                    $user->token_created_date = date('Y-m-d H:i:s');
+                    $date_token_expiry = strtotime("+30 minutes");
+                    $user->token_expiry_date = date('Y-m-d H:i:s', $date_token_expiry);
+                    $user->save(FALSE);
+                } else {
+                    $this->retVal->message = "Wrong user";
+                }
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('refreshtoken');
+    }
+
     public function actionSignup() {
         $this->retVal = new stdClass();
         $request = Yii::app()->request;
@@ -70,6 +145,9 @@ class UserController extends BaseController {
                             //token
                             $token = StringHelper::generateToken(16, 36);
                             $user->user_token = $token;
+                            $user->token_created_date = date('Y-m-d H:i:s');
+                            $date_token_expiry = strtotime("+30 minutes");
+                            $user->token_expiry_date = date('Y-m-d H:i:s', $date_token_expiry);
                             $user->save(FALSE);
                             if ($user->save(FALSE)) {
                                 $this->retVal->message = Yii::app()->params['LOGIN_MESSAGE_SUCCESS'];
@@ -102,16 +180,14 @@ class UserController extends BaseController {
     }
 
 //    public function actionAddDummyData() {
-//        $datas = array('Nguyễn Thế Huy', 'Nguyễn Đức Thịnh', 'Phan Duy Thành', 'Nguyễn Thạc Thống', 'Ngô Anh Long', 'Phùng Nguyên Ngọc', 'Phạm Duy Thiện', 'Nguyễn Văn Lượng');
-//        $ids = array('3', '4', '5', '6');
-//        foreach ($ids as $id) {
-//            foreach ($datas as $data) {
-//                $user = new User;
-//                $user->user_name = $data;
+//        $datas = array('Nguyễn Thế Hoàng', 'Thôi Chấn Lâm', 'Trịnh Nhật Tiến', 'Vô Danh');
 //
-//                $root = User::model()->findByPk($id);
-//                $user->appendTo($root);
-//            }
+//        foreach ($datas as $data) {
+//            $user = new User;
+//            $user->user_name = $data;
+//
+//            $root = User::model()->findByPk(5);
+//            $user->appendTo($root);
 //        }
 //    }
 
@@ -131,12 +207,15 @@ class UserController extends BaseController {
         $this->render('getallroots');
     }
 
-    public function actionGetChildOfRootById() {
+    public function actionGetChildrenOfNodeById() {
+
         $this->retVal = new stdClass();
         $request = Yii::app()->request;
         if ($request->isPostRequest && isset($_POST)) {
             try {
-                $root = Yii::app()->request->getPost('root');
+            //    $authenticate = Yii::app()->request->getPost('authenticate');
+            
+                $root = Yii::app()->request->getPost('node');
                 $users = User::model()->findByPk($root);
                 $descendants = $users->children()->findAll();
                 $this->retVal->data = $descendants;
@@ -147,7 +226,7 @@ class UserController extends BaseController {
             Yii::app()->end();
         }
 
-        $this->render('getchildofrootbyid');
+        $this->render('getchildrenofnodebyid');
     }
 
     public function actionGetChildOfRootByName() {
@@ -245,7 +324,7 @@ class UserController extends BaseController {
         $this->render('getnodeprevsiblingbyid');
     }
 
-    public function getNodeById() {
+    public function actionGetNodeById() {
         $this->retVal = new stdClass();
         $request = Yii::app()->request;
         if ($request->isPostRequest && isset($_POST)) {
@@ -261,6 +340,44 @@ class UserController extends BaseController {
         }
 
         $this->render('getnodebyid');
+    }
+
+    public function actionGetDesOfNodeById() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $node = Yii::app()->request->getPost('node');
+                $user = User::model()->findByPk($node);
+                $descendants = $user->descendants()->findAll();
+                $this->retVal->data = $descendants;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getdesofnodebyid');
+    }
+
+    public function actionGetAnsOfNodeById() {
+        $this->retVal = new stdClass();
+        $request = Yii::app()->request;
+        if ($request->isPostRequest && isset($_POST)) {
+            try {
+                $node = Yii::app()->request->getPost('node');
+                $user = User::model()->findByPk($node);
+                $ancestors = $user->ancestors()->findAll();
+                $this->retVal->data = $ancestors;
+            } catch (exception $e) {
+                $this->retVal->message = $e->getMessage();
+            }
+            echo CJSON::encode($this->retVal);
+            Yii::app()->end();
+        }
+
+        $this->render('getansofnodebyid');
     }
 
     // Uncomment the following methods and override them if needed

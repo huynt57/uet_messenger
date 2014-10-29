@@ -22,6 +22,8 @@
  * @property integer $level
  * @property integer $root
  * @property string $user_name
+ * @property string $token_created_date
+ * @property string $token_expiry_date
  */
 class User extends CActiveRecord
 {
@@ -42,12 +44,12 @@ class User extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('user_active, lft, rgt, level, root', 'numerical', 'integerOnly'=>true),
-			array('user_email, user_password, user_token, user_phone, user_dob, user_gender, user_facebook, user_name', 'length', 'max'=>100),
+			array('user_email, user_password, user_token, user_phone, user_dob, user_gender, user_facebook, user_name, token_created_date, token_expiry_date', 'length', 'max'=>100),
 			array('user_course, user_study_field', 'length', 'max'=>300),
 			array('user_forte, user_archivement', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('user_id, user_email, user_password, user_token, user_active, user_phone, user_dob, user_gender, user_course, user_study_field, user_forte, user_archivement, user_facebook, lft, rgt, level, root, user_name', 'safe', 'on'=>'search'),
+			array('user_id, user_email, user_password, user_token, user_active, user_phone, user_dob, user_gender, user_course, user_study_field, user_forte, user_archivement, user_facebook, lft, rgt, level, root, user_name, token_created_date, token_expiry_date', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -86,6 +88,8 @@ class User extends CActiveRecord
 			'level' => 'Level',
 			'root' => 'Root',
 			'user_name' => 'User Name',
+			'token_created_date' => 'Token Created Date',
+			'token_expiry_date' => 'Token Expiry Date',
 		);
 	}
 
@@ -125,6 +129,8 @@ class User extends CActiveRecord
 		$criteria->compare('level',$this->level);
 		$criteria->compare('root',$this->root);
 		$criteria->compare('user_name',$this->user_name,true);
+		$criteria->compare('token_created_date',$this->token_created_date,true);
+		$criteria->compare('token_expiry_date',$this->token_expiry_date,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -141,7 +147,6 @@ class User extends CActiveRecord
 	{
 		return parent::model($className);
 	}
-        
         public function behaviors() {
         return array(
             'NestedSetBehavior' => array(
